@@ -3,7 +3,7 @@ from functions.system import get_screen_resolution_windows, is_winnt
 from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PySide6.QtCore import Qt
 from ui.main import Ui_MainWindow
-Version = '0.1.0'
+Version = '0.1.1'
 class ScreenLock(QMainWindow):
     def __init__(self):
         self.width, self.height = get_screen_resolution_windows()
@@ -17,9 +17,7 @@ class ScreenLock(QMainWindow):
 
         self.centralWidget().installEventFilter(self)
         self.ui.versionlabel.setText(f"Version: {Version}")
-
-        central = self.centralWidget()
-        label_height = self.height
+        self.ui.versionlabel.move(self.ui.versionlabel.x(),self.height-240)
 
     def eventFilter(self, obj, event):
         if obj == self.centralWidget() and event.type() == event.Type.MouseButtonPress:
