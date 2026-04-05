@@ -1,5 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+ui/__pycache__/
+functions/__pycache__/
 *.py[codz]
 *$py.class
 
@@ -206,5 +208,6 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-#ExRFy's Custom Folder
+#ExRFy's Custom File & Folder
 old_project/
+pwd.json
