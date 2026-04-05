@@ -25,7 +25,7 @@ A simple ScreenLock with Qt6(PySide6)
 
 <p id="介绍"></p>
 
-------
+------=
 
 # 介绍
 这是一个用Qt6(PySide6)做的屏幕锁定
