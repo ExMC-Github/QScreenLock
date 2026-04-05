@@ -1,10 +1,25 @@
 import sys
 from functions.system import get_screen_resolution_windows, is_winnt
-from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QDialog
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox, QDialog, QLineEdit
 from PySide6.QtCore import Qt
 from ui.main import Ui_MainWindow
 from ui.pwd import Ui_InputPwdForm
-Version = '0.1.2'
+import json
+import hashlib
+import zlib
+import os
+Version = '1.0.0'
+if os.path.exists('pwd.json') == False:
+    pwd_hashs = ['f6f3639b72373f2c2c41d0a91be29e3f0ccc3fcee9fc356213e6fd19383b244f']
+    with open('pwd.json', 'w') as f:
+        json.dump({"pwd_hashs": pwd_hashs}, f, indent=4)
+else:
+    with open('pwd.json', 'r', encoding='utf-8') as f:
+        data = json.load(f)
+        if 'pwd_hashs' in data:
+            pwd_hashs = data['pwd_hashs']
+
+
 class ScreenLock(QMainWindow):
     def __init__(self):
         self.width, self.height = get_screen_resolution_windows()
@@ -38,12 +53,14 @@ class ScreenLock(QMainWindow):
         dlg.move(screen_center - dlg.rect().center())
         if dlg.exec() == QDialog.DialogCode.Accepted:
             self.hide()
+            """
             msg_box = QMessageBox(None)
             msg_box.setWindowTitle("QScreenLock")
             msg_box.setText("Password correct, This Window will closed.")
             msg_box.setIcon(QMessageBox.Icon.Information)
             msg_box.setWindowFlags(msg_box.windowFlags() | Qt.WindowStaysOnTopHint)
             msg_box.exec()
+            """
             self.close()
         """
         msg_box = QMessageBox(None)
@@ -57,17 +74,21 @@ class ScreenLock(QMainWindow):
 
 class InputPwdDialog(QDialog, Ui_InputPwdForm):
     def __init__(self, parent=None):
+        global pwd_hashs
         super().__init__(parent)
         self.setupUi(self)
+        self.lineEdit.setEchoMode(QLineEdit.EchoMode.Password)
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint | Qt.Tool)
         self.setFixedSize(self.width(), self.height())
         self.setWindowTitle("Entry Password")
         self.pushButton.clicked.connect(self.confirm)
         self.pushButton_2.clicked.connect(self.reject)
-        self.correct_password = "123456"
 
     def confirm(self):
-        if self.lineEdit.text() == self.correct_password:
+        sha256_hash = hashlib.sha256()
+        text_bytes = zlib.compress(self.lineEdit.text().encode('utf-16'))
+        sha256_hash.update(text_bytes)
+        if sha256_hash.hexdigest() in pwd_hashs:
             self.accept()
         else:
             QMessageBox.warning(self, "Error", "Password incorrect, please try again.")
@@ -77,7 +98,7 @@ class InputPwdDialog(QDialog, Ui_InputPwdForm):
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setStyle("windows11")
+    app.setStyle("Fusion")
     window = ScreenLock()
     if is_winnt() == False:
         QMessageBox.critical(None, "Error!", "This Program cannot run in not Windows system.")
